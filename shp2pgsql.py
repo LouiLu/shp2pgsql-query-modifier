@@ -44,8 +44,9 @@ current_datetime = datetime.now()
 print('Start generating SQL script at '+ current_datetime.isoformat())
 parser = argparse.ArgumentParser()
 parser.add_argument('shape_file', help='Path to the shapefile')
-parser.add_argument('input_file', help='Path to the input SQL file')
-parser.add_argument('output_file', help='Path to the output SQL file')
+parser.add_argument('-i', '--input_file', help='Path to the input SQL file', default='shp2pgsql_init.sql')
+parser.add_argument('-o', '--output_file', help='Path to the output SQL file', default='output.sql')
+parser.add_argument('-O', '--output_folder', help='Folder path to the output SQL files', default='outputs')
 parser.add_argument('-s', '--schema', help='Database schema', default='transportiq')
 parser.add_argument('-d', '--database', help='Database name', default='iq-map')
 parser.add_argument('-t', '--table', help='Table name', default='ADABoundary')
@@ -62,11 +63,11 @@ process1 = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.P
 shp2pgsql_output, _ = process1.communicate()
 
 # Write the modified SQL query to a file
-with open(args.input_file, 'w') as file:
+with open(args.output_folder + '/' + args.input_file, 'w') as file:
     file.write(shp2pgsql_output.decode('utf-8'))
 
 # Read the init query from the input file
-with open(args.input_file, 'r') as file:
+with open(args.output_folder + '/' + args.input_file, 'r') as file:
     sql_queries = file.read()
 
 # Manipulate the SQL queries
@@ -104,7 +105,7 @@ for query in sql_queries.split(';'):
         modified_queries.append(query)
 
 # Write the modified queries to a new SQL file
-with open(args.output_file, 'w') as file:
+with open(args.output_folder + '/' + args.output_file, 'w') as file:
     for query in modified_queries:
         file.write(query + ";\n")
 
