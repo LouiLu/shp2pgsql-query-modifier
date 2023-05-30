@@ -1,5 +1,6 @@
 import re
 import argparse
+import psycopg2
 import subprocess
 from datetime import datetime
 
@@ -47,12 +48,17 @@ parser.add_argument('shape_file', help='Path to the shapefile')
 parser.add_argument('-i', '--input_file', help='Path to the input SQL file', default='shp2pgsql_init.sql')
 parser.add_argument('-o', '--output_file', help='Path to the output SQL file', default='output.sql')
 parser.add_argument('-O', '--output_folder', help='Folder path to the output SQL files', default='outputs')
+parser.add_argument('-H', '--host', help='Database host', default='localhost')
+parser.add_argument('-U', '--user', help='Database user', default='xxx')
+parser.add_argument('-P', '--password', help='Database password', default='xxx')
+parser.add_argument('-p', '--port', help='Database port', default=5432)
 parser.add_argument('-s', '--schema', help='Database schema', default='transportiq')
 parser.add_argument('-d', '--database', help='Database name', default='iq-map')
 parser.add_argument('-t', '--table', help='Table name', default='ADABoundary')
 parser.add_argument('-r', '--removeColumns', help='Columns name to remove', default='bufferdist')
 parser.add_argument('-m', '--mappingColumns', help='Customize column name, using format <shpCol>:<tableCol> and separated with comma if multiple mapping needed', default='id:name')
 parser.add_argument('-T', '--times', help='File related times to set')
+parser.add_argument('-f', '--forward', help='Forward importing generated sql file to database', action='store_true')
 args = parser.parse_args()
 
 # Generate init insert query by using shp2pgsql
@@ -111,3 +117,32 @@ with open(args.output_folder + '/' + args.output_file, 'w') as file:
 
 print('SQL file generated in file '+ args.output_file)
 
+print('Start import shapefile to database '+ args.schema + '.' + args.database)
+try:
+	# Connect to the database
+    conn = psycopg2.connect(
+        host=args.host,
+        port=args.port,
+        user=args.user,
+        password=args.password,
+        database=args.database
+    )
+
+    if args.forward:
+        # Open and read the SQL file
+        with open(args.output_folder + '/' + args.output_file, 'r') as sql_file:
+            sql_commands = sql_file.read()
+
+        # Execute the SQL commands
+        cursor = conn.cursor()
+        cursor.execute(sql_commands)
+        conn.commit()
+
+        # Close the database connection
+        cursor.close()
+        conn.close()
+        print('Shapefile been imported successfully')
+
+except (psycopg2.Error, FileNotFoundError) as e:
+    print("An error occurred while importing the SQL file to database:")
+    print(str(e))
