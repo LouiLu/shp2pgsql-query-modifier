@@ -1,24 +1,28 @@
 import tkinter as tk
 from tkinter import ttk
 import subprocess
-import tkFileDialog
+from tkinter import filedialog
+
+print(tk.__file__)
 
 def select_shapefile():
-    shape_file = tkFileDialog.askopenfilename(initialdir="./", title="Select Shapefile")
+    shape_file = filedialog.askopenfilename(initialdir="./", title="Select Shapefile")
     shape_file_entry.delete(0, tk.END)
     shape_file_entry.insert(0, shape_file)
 
 def run_script():
     shape_file = shape_file_entry.get()
-    input_file = input_file_entry.get() or 'shp2pgsql_init.sql'
+    input_file = 'shp2pgsql_init.sql'
     output_file = output_file_entry.get() or 'output.sql'
     output_folder = output_folder_entry.get() or 'outputs'
     schema = schema_entry.get() or 'transportiq'
     database = database_entry.get() or 'iq-map'
     table = table_entry.get() or 'ADABoundary'
-    remove_columns = remove_columns_entry.get() or 'bufferdist'
-    mapping_columns = mapping_columns_entry.get() or 'id:name'
-    times = times_entry.get()
+    remove_columns = 'bufferdist'
+    # remove_columns = remove_columns_entry.get() or 'bufferdist'
+    mapping_columns = 'id:name'
+    # mapping_columns = mapping_columns_entry.get() or 'id:name'
+    # times = times_entry.get()
     forward_import = flag_var.get()
 
     # Construct the command with the provided arguments
@@ -36,12 +40,12 @@ def run_script():
         command += " -d {}".format(database)
     if table:
         command += " -t {}".format(table)
-    if remove_columns:
-        command += " -r {}".format(remove_columns)
-    if mapping_columns:
-        command += " -m {}".format(mapping_columns)
-    if times:
-        command += " -T {}".format(times)
+    # if remove_columns:
+    #     command += " -r {}".format(remove_columns)
+    # if mapping_columns:
+    #     command += " -m {}".format(mapping_columns)
+    # if times:
+    #     command += " -T {}".format(times)
     if forward_import:
         command += " -f"
 
@@ -82,10 +86,10 @@ shape_file_entry.grid(row=1, column=1, padx=10)
 browse_button = ttk.Button(window, text="Browse", command=select_shapefile)
 browse_button.grid(row=1, column=2, padx=10)
 
-input_file_label = ttk.Label(window, text="File name:", anchor='w')
-input_file_label.grid(row=2, column=0, sticky=tk.E, padx=10)
-input_file_entry = ttk.Entry(window)
-input_file_entry.grid(row=2, column=1, padx=10)
+# input_file_label = ttk.Label(window, text="File name:", anchor='w')
+# input_file_label.grid(row=2, column=0, sticky=tk.E, padx=10)
+# input_file_entry = ttk.Entry(window)
+# input_file_entry.grid(row=2, column=1, padx=10)
 
 output_section = ttk.Label(window, text="Output Files", anchor='w')
 output_section.grid(row=3, column=0, sticky=tk.W, padx=10, pady=(10, 5))
@@ -103,35 +107,40 @@ output_folder_entry.grid(row=5, column=1, padx=10)
 database_section = ttk.Label(window, text="Database Configuration", anchor='w')
 database_section.grid(row=6, column=0, sticky=tk.W, padx=10, pady=(10, 5))
 
-schema_label = ttk.Label(window, text="Database schema:", anchor='w')
+schema_label = ttk.Label(window, text="Schema:", anchor='w')
 schema_label.grid(row=7, column=0, sticky=tk.E, padx=10)
 schema_entry = ttk.Entry(window)
 schema_entry.grid(row=7, column=1, sticky=tk.E, padx=10)
 
-database_label = ttk.Label(window, text="Database name:", anchor='w')
+database_label = ttk.Label(window, text="Database:", anchor='w')
 database_label.grid(row=8, column=0, sticky=tk.E, padx=10)
 database_entry = ttk.Entry(window)
 database_entry.grid(row=8, column=1, sticky=tk.E, padx=10)
 
-table_label = ttk.Label(window, text="Table name:", anchor='w')
+table_label = ttk.Label(window, text="Table:", anchor='w')
 table_label.grid(row=9, column=0, sticky=tk.E, padx=10)
 table_entry = ttk.Entry(window)
 table_entry.grid(row=9, column=1, sticky=tk.E, padx=10)
 
-remove_columns_label = ttk.Label(window, text="Columns to remove:", anchor='w')
-remove_columns_label.grid(row=10, column=0, sticky=tk.E, padx=10)
-remove_columns_entry = ttk.Entry(window)
-remove_columns_entry.grid(row=10, column=1, sticky=tk.E, padx=10)
+host_label = ttk.Label(window, text="Host:", anchor='w')
+host_label.grid(row=10, column=0, sticky=tk.E, padx=10)
+host_entry = ttk.Entry(window)
+host_entry.grid(row=10, column=1, sticky=tk.E, padx=10)
 
-mapping_columns_label = ttk.Label(window, text="Mapping columns:", anchor='w')
-mapping_columns_label.grid(row=11, column=0, sticky=tk.E, padx=10)
-mapping_columns_entry = ttk.Entry(window)
-mapping_columns_entry.grid(row=11, column=1, sticky=tk.E, padx=10)
+# remove_columns_label = ttk.Label(window, text="Columns to remove:", anchor='w')
+# remove_columns_label.grid(row=10, column=0, sticky=tk.E, padx=10)
+# remove_columns_entry = ttk.Entry(window)
+# remove_columns_entry.grid(row=10, column=1, sticky=tk.E, padx=10)
 
-times_label = ttk.Label(window, text="File related times:", anchor='w')
-times_label.grid(row=12, column=0, sticky=tk.E, padx=10)
-times_entry = ttk.Entry(window)
-times_entry.grid(row=12, column=1, sticky=tk.E, padx=10)
+# mapping_columns_label = ttk.Label(window, text="Mapping columns:", anchor='w')
+# mapping_columns_label.grid(row=11, column=0, sticky=tk.E, padx=10)
+# mapping_columns_entry = ttk.Entry(window)
+# mapping_columns_entry.grid(row=11, column=1, sticky=tk.E, padx=10)
+
+# times_label = ttk.Label(window, text="File related times:", anchor='w')
+# times_label.grid(row=12, column=0, sticky=tk.E, padx=10)
+# times_entry = ttk.Entry(window)
+# times_entry.grid(row=12, column=1, sticky=tk.E, padx=10)
 
 # Create a checkbox
 flag_var = tk.BooleanVar()

@@ -1,2 +1,9 @@
 outputs/
 tests/
+env/
+build/
+dist/
+*.spec
+*.shp
+*.dbf
+*.shx

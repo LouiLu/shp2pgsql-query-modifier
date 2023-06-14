@@ -26,7 +26,10 @@ def set_columns(query, removeColumns, timesColumns, mappingColumns, schema, tabl
 		# Remove columns
 		for remove_column in removeColumns:
 			remove_column_name = '"'+ remove_column +'"' if remove_column != 'geom' else remove_column
-			column_index = keys_array.index(remove_column_name)
+			try:
+				column_index = keys_array.index(remove_column_name)
+			except ValueError:
+				continue
 			keys_array.pop(column_index)
 			values_array.pop(column_index)
 			print('Removed ' + remove_column)
@@ -55,7 +58,7 @@ parser.add_argument('-p', '--port', help='Database port', default=5432)
 parser.add_argument('-s', '--schema', help='Database schema', default='transportiq')
 parser.add_argument('-d', '--database', help='Database name', default='iq-map')
 parser.add_argument('-t', '--table', help='Table name', default='ADABoundary')
-parser.add_argument('-r', '--removeColumns', help='Columns name to remove', default='bufferdist')
+parser.add_argument('-r', '--removeColumns', help='Columns name to remove', default='bufferdist,count')
 parser.add_argument('-m', '--mappingColumns', help='Customize column name, using format <shpCol>:<tableCol> and separated with comma if multiple mapping needed', default='id:name')
 parser.add_argument('-T', '--times', help='File related times to set')
 parser.add_argument('-f', '--forward', help='Forward importing generated sql file to database', action='store_true')
