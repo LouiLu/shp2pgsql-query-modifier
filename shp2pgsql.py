@@ -125,32 +125,32 @@ with open(args.output_folder + '/' + args.output_file, 'w') as file:
 
 print('SQL file generated in file '+ args.output_file)
 
-print('Start import shapefile to database '+ args.schema + '.' + args.database)
-try:
-	# Connect to the database
-    conn = psycopg2.connect(
-        host=args.host,
-        port=args.port,
-        user=args.user,
-        password=args.password,
-        database=args.database
-    )
+if args.forward: 
+	try:
+		# Connect to the database
+		conn = psycopg2.connect(
+			host=args.host,
+			port=args.port,
+			user=args.user,
+			password=args.password,
+			database=args.database
+		)
 
-    if args.forward:
-        # Open and read the SQL file
-        with open(args.output_folder + '/' + args.output_file, 'r') as sql_file:
-            sql_commands = sql_file.read()
+		if args.forward:
+			# Open and read the SQL file
+			with open(args.output_folder + '/' + args.output_file, 'r') as sql_file:
+				sql_commands = sql_file.read()
 
-        # Execute the SQL commands
-        cursor = conn.cursor()
-        cursor.execute(sql_commands)
-        conn.commit()
+			# Execute the SQL commands
+			cursor = conn.cursor()
+			cursor.execute(sql_commands)
+			conn.commit()
 
-        # Close the database connection
-        cursor.close()
-        conn.close()
-        print('Shapefile been imported successfully')
+			# Close the database connection
+			cursor.close()
+			conn.close()
+			print('Shapefile been imported successfully')
 
-except (psycopg2.Error, FileNotFoundError) as e:
-    print("An error occurred while importing the SQL file to database:")
-    print(str(e))
+	except (psycopg2.Error, FileNotFoundError) as e:
+		print("An error occurred while importing the SQL file to database:")
+		print(str(e))

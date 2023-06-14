@@ -1,6 +1,7 @@
 outputs/
 tests/
 env/
+myenv/
 build/
 dist/
 *.spec
