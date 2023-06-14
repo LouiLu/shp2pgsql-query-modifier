@@ -1,4 +1,5 @@
 import re
+import os
 import argparse
 import psycopg2
 import subprocess
@@ -75,6 +76,10 @@ command = ['shp2pgsql', '-a', '-s', '4326', '-g', 'geom', args.shape_file, args.
 # Execute the shp2pgsql command
 process1 = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 shp2pgsql_output, _ = process1.communicate()
+
+# Create the folder if it doesn't exist
+if not os.path.exists(args.output_folder):
+    os.makedirs(args.output_folder)
 
 # Write the modified SQL query to a file
 with open(args.output_folder + '/' + args.input_file, 'w') as file:
