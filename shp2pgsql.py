@@ -4,11 +4,13 @@ import psycopg2
 import subprocess
 from datetime import datetime
 
-def set_columns(query, removeColumns, timesColumns, mappingColumns, schema, table):
+def set_columns(query, removeColumns, timesColumns, mappingColumns, availablilities, schema, table):
     	# Extract the objects within parentheses using regular expressions
 	objects_array = re.findall(r'\((.*?)\)', query)
 	extra_time_columns = ['"startTime"', '"endTime"', '"startDate"', '"endDate"']
 	extra_time_values = ["'" + timesColumns['startTime'] + "'", "'" + timesColumns['endTime'] + "'", "'"+ timesColumns['startDate'] +"'", "'"+timesColumns['endDate']+"'"]
+	extra_availability_columns = ['"sunday"', '"monday"', '"tuesday"', '"wednesday"', '"thursday"', '"friday"', '"saturday"', '"holiday"']
+	extra_availability_values = availablilities.split(':')
 
 	# Process each object to remove leading/trailing whitespace and split into individual items
 	if len(objects_array) > 0:
@@ -36,7 +38,9 @@ def set_columns(query, removeColumns, timesColumns, mappingColumns, schema, tabl
 
 		# Add table needed columns
 		keys_array += extra_time_columns
+		keys_array += extra_availability_columns
 		values_array += extra_time_values
+		values_array += extra_availability_values
 		modified_query = 'INSERT INTO '+ schema + '."' + table+ '" (' + ', '.join(keys_array) + ')' + ' VALUES (' + ', '.join(values_array) + ')'
 		return modified_query
 
@@ -58,6 +62,7 @@ parser.add_argument('-p', '--port', help='Database port', default=5432)
 parser.add_argument('-s', '--schema', help='Database schema', default='transportiq')
 parser.add_argument('-d', '--database', help='Database name', default='iq-map')
 parser.add_argument('-t', '--table', help='Table name', default='ADABoundary')
+parser.add_argument('-a', '--availablilities', help='Shapefile availabilities through the week', default='true:true:true:true:true:true:true:true')
 parser.add_argument('-r', '--removeColumns', help='Columns name to remove', default='bufferdist,count')
 parser.add_argument('-m', '--mappingColumns', help='Customize column name, using format <shpCol>:<tableCol> and separated with comma if multiple mapping needed', default='id:name')
 parser.add_argument('-T', '--times', help='File related times to set')
@@ -106,7 +111,7 @@ for query in sql_queries.split(';'):
     if query.startswith("INSERT INTO"):
         # Manipulate the query
         modified_query = query
-        modified_query = set_columns(modified_query, columns_to_remove, extra_times_column, columns_mapping, args.schema, args.table)
+        modified_query = set_columns(modified_query, columns_to_remove, extra_times_column, columns_mapping, args.availablilities, args.schema, args.table)
         modified_queries.append(modified_query)
     elif query.startswith("ANALYZE"):
         modified_queries.append('ANALYZE ' + args.schema + '."' + args.table + '"')
